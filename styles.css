@@ -1,6 +1,7 @@
 :root {
   color-scheme: dark;
   --ink: #10130f;
+  --night: #0b0e0a;
   --panel: #191d17;
   --paper: #f7ffdf;
   --muted: #aeb9a1;
@@ -20,12 +21,13 @@ html {
   background:
     linear-gradient(120deg, rgba(73, 220, 226, 0.13), transparent 32%),
     radial-gradient(circle at 78% 16%, rgba(240, 197, 65, 0.12), transparent 24%),
-    #0b0e0a;
+    var(--night);
 }
 
 body {
   min-height: 100vh;
   margin: 0;
+  overflow-x: hidden;
   color: var(--paper);
   font-family: "Trebuchet MS", "Avenir Next", Verdana, sans-serif;
   letter-spacing: 0;
@@ -68,6 +70,7 @@ button:disabled {
   min-height: 100vh;
   margin: 0 auto;
   padding: 24px 0;
+  overflow: clip;
 }
 
 .stage {
@@ -131,6 +134,7 @@ canvas {
   gap: 24px;
   align-content: center;
   min-width: 0;
+  max-width: 100%;
 }
 
 .brand-lockup {
@@ -144,6 +148,10 @@ h1 {
   font-size: clamp(3rem, 8vw, 5.6rem);
   line-height: 0.86;
   text-transform: uppercase;
+}
+
+h1 span {
+  display: block;
 }
 
 .kicker {
@@ -179,12 +187,14 @@ h1 {
 
 .pad {
   display: grid;
-  grid-template-columns: repeat(3, minmax(58px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: repeat(2, 58px);
   gap: 10px;
+  width: 100%;
 }
 
 .pad button {
+  min-width: 0;
   color: var(--ink);
   background: var(--paper);
   font-size: 1.5rem;
@@ -236,15 +246,18 @@ body[data-state="playing"] .status-row strong {
     grid-template-columns: 1fr;
     align-content: start;
     gap: 22px;
+    min-height: auto;
+    overflow: hidden;
   }
 
   .console {
     order: -1;
     gap: 16px;
+    width: 100%;
   }
 
   h1 {
-    font-size: clamp(2.4rem, 16vw, 4.2rem);
+    font-size: clamp(2.7rem, 17vw, 4.1rem);
   }
 }
 
@@ -252,6 +265,11 @@ body[data-state="playing"] .status-row strong {
   .game-shell {
     width: min(100vw - 20px, 480px);
     padding: 10px 0 18px;
+    gap: 16px;
+  }
+
+  .stage {
+    gap: 12px;
   }
 
   .score-strip div {
@@ -264,5 +282,38 @@ body[data-state="playing"] .status-row strong {
 
   .action-row {
     grid-template-columns: 1fr;
+  }
+
+  .pad {
+    grid-template-rows: repeat(2, 58px);
+    gap: 8px;
+  }
+
+  .key-map {
+    grid-template-columns: repeat(3, minmax(0, max-content));
+    gap: 6px;
+  }
+
+  .key-map span {
+    padding: 7px 9px;
+    font-size: 0.66rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  h1 {
+    font-size: clamp(2.25rem, 16vw, 3.25rem);
+  }
+
+  .score-strip span,
+  .status-row span,
+  .kicker,
+  .key-map span {
+    font-size: 0.62rem;
+  }
+
+  .pad {
+    grid-template-rows: repeat(2, 52px);
   }
 }
