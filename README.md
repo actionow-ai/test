@@ -1,6 +1,6 @@
-# Snake Relay
+# Tetris Stack
 
-A small dependency-free snake game for the browser.
+A dependency-free browser Tetris game built with vanilla JavaScript and Canvas.
 
 ## Run
 

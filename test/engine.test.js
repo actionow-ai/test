@@ -1,126 +1,115 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  createEmptyBoard,
   createInitialState,
-  getNextDirection,
-  stepGame,
+  getPieceCells,
+  hardDrop,
+  movePiece,
+  rotatePiece,
+  startGame,
+  tick,
 } from "../src/engine.js";
 
-test("createInitialState centers the snake and places food off the snake", () => {
-  const state = createInitialState({ cols: 12, rows: 10, rng: () => 0.99 });
+function filled(type = "X") {
+  return { type };
+}
 
-  assert.deepEqual(state.snake, [
-    { x: 6, y: 5 },
-    { x: 5, y: 5 },
-    { x: 4, y: 5 },
-  ]);
-  assert.notDeepEqual(state.food, state.snake[0]);
+test("createInitialState builds a centered 10x20 tetris board with a queued next piece", () => {
+  const state = createInitialState({ queue: ["T", "I", "O"] });
+
+  assert.equal(state.cols, 10);
+  assert.equal(state.rows, 20);
+  assert.equal(state.board.length, 20);
+  assert.equal(state.board[0].length, 10);
+  assert.equal(state.active.type, "T");
+  assert.equal(state.active.x, 3);
+  assert.equal(state.active.y, 0);
+  assert.equal(state.next.type, "I");
   assert.equal(state.score, 0);
+  assert.equal(state.lines, 0);
+  assert.equal(state.level, 1);
   assert.equal(state.status, "ready");
 });
 
-test("getNextDirection ignores direct reversals", () => {
-  assert.equal(getNextDirection("right", "left"), "right");
-  assert.equal(getNextDirection("right", "up"), "up");
-  assert.equal(getNextDirection("up", "down"), "up");
+test("movePiece shifts the active tetromino until the wall blocks it", () => {
+  let state = startGame(createInitialState({ cols: 6, rows: 8, queue: ["O", "I"] }));
+
+  state = movePiece(state, -1);
+  state = movePiece(state, -1);
+  state = movePiece(state, -1);
+
+  assert.equal(state.active.x, 0);
+
+  const blocked = movePiece(state, -1);
+
+  assert.equal(blocked.active.x, 0);
 });
 
-test("stepGame moves forward without growing when food is not eaten", () => {
-  const state = {
-    cols: 8,
-    rows: 8,
-    snake: [
-      { x: 3, y: 3 },
-      { x: 2, y: 3 },
-      { x: 1, y: 3 },
-    ],
-    direction: "right",
-    nextDirection: "right",
-    food: { x: 6, y: 6 },
-    score: 0,
-    highScore: 0,
-    status: "playing",
-  };
+test("rotatePiece rotates a tetromino and keeps all cells inside the board", () => {
+  const state = startGame(createInitialState({ cols: 10, rows: 20, queue: ["T", "I"] }));
 
-  const next = stepGame(state, { rng: () => 0 });
+  const rotated = rotatePiece(state);
 
-  assert.deepEqual(next.snake, [
-    { x: 4, y: 3 },
-    { x: 3, y: 3 },
-    { x: 2, y: 3 },
-  ]);
-  assert.equal(next.score, 0);
+  assert.equal(rotated.active.rotation, 1);
+  assert.notDeepEqual(getPieceCells(rotated.active), getPieceCells(state.active));
+  assert.ok(getPieceCells(rotated.active).every((cell) => cell.x >= 0 && cell.x < state.cols));
+});
+
+test("tick drops the active piece by one row while the game is playing", () => {
+  const state = startGame(createInitialState({ cols: 6, rows: 8, queue: ["O", "I"] }));
+
+  const next = tick(state);
+
+  assert.equal(next.active.y, 1);
   assert.equal(next.status, "playing");
 });
 
-test("stepGame grows, scores, and moves food when eating", () => {
-  const state = {
-    cols: 8,
-    rows: 8,
-    snake: [
-      { x: 3, y: 3 },
-      { x: 2, y: 3 },
-      { x: 1, y: 3 },
-    ],
-    direction: "right",
-    nextDirection: "right",
-    food: { x: 4, y: 3 },
-    score: 0,
-    highScore: 0,
-    status: "playing",
-  };
+test("hardDrop locks the piece, awards drop points, and spawns the next tetromino", () => {
+  const state = startGame(createInitialState({ cols: 6, rows: 8, queue: ["O", "I", "T"] }));
 
-  const next = stepGame(state, { rng: () => 0.5 });
+  const next = hardDrop(state);
 
-  assert.equal(next.snake.length, 4);
-  assert.deepEqual(next.snake[0], { x: 4, y: 3 });
-  assert.equal(next.score, 10);
-  assert.equal(next.highScore, 10);
-  assert.notDeepEqual(next.food, { x: 4, y: 3 });
+  assert.equal(next.active.type, "I");
+  assert.equal(next.score, 12);
+  assert.equal(next.board[6][2].type, "O");
+  assert.equal(next.board[6][3].type, "O");
+  assert.equal(next.board[7][2].type, "O");
+  assert.equal(next.board[7][3].type, "O");
 });
 
-test("stepGame ends the game when the snake hits a wall", () => {
-  const state = {
-    cols: 8,
-    rows: 8,
-    snake: [
-      { x: 7, y: 3 },
-      { x: 6, y: 3 },
-      { x: 5, y: 3 },
-    ],
-    direction: "right",
-    nextDirection: "right",
-    food: { x: 2, y: 2 },
-    score: 0,
-    highScore: 20,
-    status: "playing",
-  };
+test("locking a piece clears completed lines and scores by tetris line rules", () => {
+  const board = createEmptyBoard(4, 4);
+  board[3][0] = filled();
+  board[3][1] = filled();
 
-  const next = stepGame(state);
+  const state = startGame({
+    ...createInitialState({ cols: 4, rows: 4, queue: ["O", "I"] }),
+    board,
+    active: { type: "O", rotation: 0, x: 2, y: 2 },
+  });
 
-  assert.equal(next.status, "gameover");
-  assert.equal(next.highScore, 20);
+  const next = hardDrop(state);
+
+  assert.equal(next.lines, 1);
+  assert.equal(next.score, 100);
+  assert.deepEqual(next.board[0], [null, null, null, null]);
+  assert.equal(next.board[3][2].type, "O");
+  assert.equal(next.board[3][3].type, "O");
 });
 
-test("stepGame ends the game when the snake hits itself", () => {
-  const state = {
-    cols: 8,
-    rows: 8,
-    snake: [
-      { x: 4, y: 3 },
-      { x: 3, y: 3 },
-      { x: 3, y: 4 },
-      { x: 4, y: 4 },
-    ],
-    direction: "up",
-    nextDirection: "left",
-    food: { x: 7, y: 7 },
-    score: 30,
-    highScore: 30,
-    status: "playing",
-  };
+test("spawning into occupied cells ends the game", () => {
+  const board = createEmptyBoard(4, 4);
+  board[0][1] = filled("Z");
 
-  const next = stepGame(state);
+  const state = startGame({
+    ...createInitialState({ cols: 4, rows: 4, queue: ["O", "O"] }),
+    board,
+    active: { type: "O", rotation: 0, x: 2, y: 2 },
+  });
+
+  const next = hardDrop(state);
 
   assert.equal(next.status, "gameover");
+  assert.equal(next.active.type, "O");
 });

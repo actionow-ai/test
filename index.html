@@ -3,43 +3,55 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0b0e0a">
-    <title>Snake Relay</title>
+    <meta name="theme-color" content="#0a0d12">
+    <title>俄罗斯方块</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <main class="game-shell" aria-label="贪吃蛇游戏">
+    <main class="game-shell" aria-label="俄罗斯方块游戏">
       <section class="stage" aria-label="游戏棋盘">
         <div class="score-strip" aria-live="polite">
           <div>
             <span>Score</span>
-            <strong data-score>000</strong>
+            <strong data-score>000000</strong>
+          </div>
+          <div>
+            <span>Lines</span>
+            <strong data-lines>00</strong>
+          </div>
+          <div>
+            <span>Level</span>
+            <strong data-level>01</strong>
           </div>
           <div>
             <span>Best</span>
-            <strong data-high-score>000</strong>
-          </div>
-          <div>
-            <span>Length</span>
-            <strong data-length>3</strong>
+            <strong data-high-score>000000</strong>
           </div>
         </div>
 
-        <canvas data-board width="720" height="720" aria-label="贪吃蛇棋盘"></canvas>
+        <canvas data-board width="420" height="840" aria-label="俄罗斯方块棋盘"></canvas>
       </section>
 
       <aside class="console" aria-label="游戏控制台">
         <div class="brand-lockup">
           <span class="kicker">Arcade build</span>
-          <h1 aria-label="Snake Relay">
-            <span>Snake</span>
-            <span>Relay</span>
+          <h1 aria-label="俄罗斯方块">
+            <span>Tetris</span>
+            <span>Stack</span>
           </h1>
         </div>
 
         <div class="status-row">
           <span>Status</span>
-          <strong data-status>Ready</strong>
+          <strong data-status>待机</strong>
+        </div>
+
+        <div class="next-panel" aria-label="下一个方块">
+          <div>
+            <span>Next</span>
+            <strong data-next-label>T</strong>
+          </div>
+          <canvas data-next width="160" height="160" aria-label="下一个方块预览"></canvas>
         </div>
 
         <div class="action-row">
@@ -48,17 +60,12 @@
           <button type="button" data-reset>Reset</button>
         </div>
 
-        <div class="pad" aria-label="方向控制">
-          <button type="button" data-direction="up" aria-label="向上">↑</button>
-          <button type="button" data-direction="left" aria-label="向左">←</button>
-          <button type="button" data-direction="down" aria-label="向下">↓</button>
-          <button type="button" data-direction="right" aria-label="向右">→</button>
-        </div>
-
-        <div class="key-map" aria-label="键盘说明">
-          <span>Arrows / WASD</span>
-          <span>Space pause</span>
-          <span>R reset</span>
+        <div class="pad" aria-label="游戏操作">
+          <button type="button" data-control="left" aria-label="左移">←</button>
+          <button type="button" data-control="rotate" aria-label="旋转">↻</button>
+          <button type="button" data-control="right" aria-label="右移">→</button>
+          <button type="button" data-control="soft" aria-label="软降">↓</button>
+          <button type="button" data-control="hard" aria-label="硬降">⤓</button>
         </div>
       </aside>
     </main>
