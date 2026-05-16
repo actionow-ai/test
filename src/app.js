@@ -46,7 +46,8 @@ const statusCopy = {
 
 function readHighScore() {
   try {
-    return Number(localStorage.getItem(STORAGE_KEY) ?? "0");
+    const value = Number(localStorage.getItem(STORAGE_KEY) ?? "0");
+    return Number.isFinite(value) ? value : 0;
   } catch {
     return 0;
   }
@@ -103,7 +104,8 @@ function runControl(action) {
   }
 
   if (action === "pause") {
-    state.status === "playing" ? pause() : start();
+    if (state.status === "playing") pause();
+    else if (state.status === "paused") start();
     return;
   }
 
@@ -147,6 +149,16 @@ function render() {
   document.body.dataset.state = state.status;
   startButton.disabled = state.status === "playing";
   pauseButton.disabled = state.status === "ready" || state.status === "gameover";
+  startButton.textContent = {
+    ready: "Start",
+    playing: "Playing",
+    paused: "Resume",
+    gameover: "Retry",
+  }[state.status];
+  pauseButton.textContent = state.status === "paused" ? "Resume" : "Pause";
+  controls.forEach((button) => {
+    button.disabled = state.status === "gameover";
+  });
 }
 
 function updateCanvasSize(target) {

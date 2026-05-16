@@ -27,6 +27,7 @@ html {
 
 body {
   min-height: 100vh;
+  min-height: 100svh;
   margin: 0;
   overflow-x: hidden;
   color: var(--paper);
@@ -44,6 +45,7 @@ button {
   font: inherit;
   font-weight: 900;
   cursor: pointer;
+  touch-action: manipulation;
   transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
 }
 
@@ -76,6 +78,7 @@ button:disabled {
   justify-content: center;
   width: min(100vw - 32px, 1020px);
   min-height: 100vh;
+  min-height: 100svh;
   margin: 0 auto;
   padding: 24px 0;
 }
@@ -107,6 +110,7 @@ button:disabled {
 .score-strip span,
 .status-row span,
 .next-panel span,
+.control-hints span,
 .kicker {
   display: block;
   color: var(--muted);
@@ -122,7 +126,7 @@ button:disabled {
   margin-top: 6px;
   color: var(--green);
   font-family: "Courier New", monospace;
-  font-size: clamp(1rem, 3.2vw, 1.65rem);
+  font-size: 1.45rem;
   line-height: 1;
 }
 
@@ -133,6 +137,8 @@ canvas {
 
 [data-board] {
   width: min(100%, 460px, calc((100vh - 140px) / 2));
+  width: min(100%, 460px, calc((100svh - 140px) / 2));
+  min-width: 230px;
   aspect-ratio: 10 / 20;
   border: 1px solid rgba(68, 217, 255, 0.4);
   box-shadow:
@@ -161,7 +167,7 @@ h1 {
   margin: 0;
   color: var(--paper);
   font-family: Impact, "Arial Black", "Avenir Next Condensed", sans-serif;
-  font-size: clamp(3.2rem, 8vw, 5.7rem);
+  font-size: 5.4rem;
   font-weight: 900;
   line-height: 0.82;
   text-transform: uppercase;
@@ -197,6 +203,29 @@ h1 span:last-child {
   font-size: 1.36rem;
   line-height: 1;
   text-transform: uppercase;
+}
+
+.control-hints {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.control-hints div {
+  min-width: 0;
+  border: 1px solid rgba(245, 247, 237, 0.12);
+  background: rgba(16, 22, 33, 0.72);
+  padding: 12px;
+}
+
+.control-hints strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--paper);
+  font-family: "Courier New", monospace;
+  font-size: 0.86rem;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .next-panel {
@@ -246,6 +275,7 @@ h1 span:last-child {
   color: var(--ink);
   background: linear-gradient(180deg, #f5f7ed, #d9dfd0);
   font-size: 1.7rem;
+  user-select: none;
 }
 
 .pad button[data-control="rotate"] {
@@ -295,7 +325,7 @@ body[data-state="gameover"] [data-board] {
   }
 
   .stage {
-    order: -2;
+    order: -1;
     gap: 10px;
   }
 
@@ -303,8 +333,12 @@ body[data-state="gameover"] [data-board] {
     order: 3;
   }
 
+  .control-hints {
+    order: 2;
+  }
+
   .action-row {
-    order: -1;
+    order: -2;
   }
 
   .pad {
@@ -312,11 +346,12 @@ body[data-state="gameover"] [data-board] {
   }
 
   h1 {
-    font-size: clamp(2.8rem, 13vw, 4.1rem);
+    font-size: 4rem;
   }
 
   [data-board] {
     width: min(100%, 380px, calc((100vh - 210px) / 2));
+    width: min(100%, 380px, calc((100svh - 210px) / 2));
     margin: 0 auto;
   }
 }
@@ -324,30 +359,44 @@ body[data-state="gameover"] [data-board] {
 @media (max-width: 520px) {
   .game-shell {
     width: min(100vw - 20px, 430px);
-    padding: 12px 0 20px;
+    padding: 10px 0 18px;
+  }
+
+  .stage {
+    gap: 8px;
+  }
+
+  .brand-lockup {
+    gap: 5px;
+  }
+
+  .status-row {
+    padding: 10px 0;
   }
 
   .score-strip div {
-    padding: 11px 7px;
+    padding: 9px 6px;
   }
 
   .score-strip span,
   .status-row span,
   .next-panel span,
+  .control-hints span,
   .kicker {
     font-size: 0.61rem;
   }
 
   .score-strip strong {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   h1 {
-    font-size: clamp(2.05rem, 10vw, 2.55rem);
+    font-size: 2.25rem;
   }
 
   [data-board] {
-    width: min(100%, 250px, calc((100vh - 300px) / 2));
+    width: min(100%, 214px);
+    min-width: 190px;
   }
 
   .next-panel {
@@ -360,18 +409,41 @@ body[data-state="gameover"] [data-board] {
   }
 
   .action-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .action-row button {
+    min-height: 40px;
+  }
+
+  .control-hints {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .control-hints div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+  }
+
+  .control-hints strong {
+    margin-top: 0;
+    text-align: right;
+    white-space: normal;
   }
 
   .pad {
-    grid-template-rows: repeat(2, 56px);
-    gap: 8px;
+    grid-template-rows: repeat(2, 48px);
+    gap: 7px;
   }
 }
 
 @media (max-width: 360px) {
   h1 {
-    font-size: 2.55rem;
+    font-size: 2rem;
   }
 
   .next-panel {

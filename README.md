@@ -19,3 +19,12 @@ npm test
 ```
 
 The game logic lives in `src/engine.js`; the canvas UI lives in `src/app.js`.
+
+## Controls
+
+- Move: Left/Right arrows or A/D
+- Rotate: Up arrow, W, or X
+- Soft drop: Down arrow or S
+- Hard drop: Space
+- Pause/resume: P or Escape
+- Reset: R
