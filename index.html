@@ -4,65 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0b0e0a">
-    <title>Snake Relay</title>
+    <title>H5 Arcade MVP</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <main class="game-shell" aria-label="贪吃蛇游戏">
-      <section class="stage" aria-label="游戏棋盘">
-        <div class="score-strip" aria-live="polite">
-          <div>
-            <span>Score</span>
-            <strong data-score>000</strong>
-          </div>
-          <div>
-            <span>Best</span>
-            <strong data-high-score>000</strong>
-          </div>
-          <div>
-            <span>Length</span>
-            <strong data-length>3</strong>
-          </div>
-        </div>
-
-        <canvas data-board width="720" height="720" aria-label="贪吃蛇棋盘"></canvas>
-      </section>
-
-      <aside class="console" aria-label="游戏控制台">
-        <div class="brand-lockup">
-          <span class="kicker">Arcade build</span>
-          <h1 aria-label="Snake Relay">
-            <span>Snake</span>
-            <span>Relay</span>
-          </h1>
-        </div>
-
-        <div class="status-row">
-          <span>Status</span>
-          <strong data-status>Ready</strong>
-        </div>
-
-        <div class="action-row">
-          <button type="button" data-start>Start</button>
-          <button type="button" data-pause>Pause</button>
-          <button type="button" data-reset>Reset</button>
-        </div>
-
-        <div class="pad" aria-label="方向控制">
-          <button type="button" data-direction="up" aria-label="向上">↑</button>
-          <button type="button" data-direction="left" aria-label="向左">←</button>
-          <button type="button" data-direction="down" aria-label="向下">↓</button>
-          <button type="button" data-direction="right" aria-label="向右">→</button>
-        </div>
-
-        <div class="key-map" aria-label="键盘说明">
-          <span>Arrows / WASD</span>
-          <span>Space pause</span>
-          <span>R reset</span>
-        </div>
-      </aside>
-    </main>
-
+    <div data-app></div>
     <script type="module" src="./src/app.js"></script>
   </body>
 </html>

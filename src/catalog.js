@@ -55,13 +55,33 @@ export const gameCatalog = Object.freeze([
   }),
 ]);
 
+const presentationBySlug = Object.freeze({
+  snake: Object.freeze({
+    subtitle: "Snake Relay",
+    accent: "#9dff46",
+    shellPlayUrl: "#/play/snake",
+    difficulty: "Easy start",
+  }),
+  tetris: Object.freeze({
+    subtitle: "Block Drop",
+    accent: "#49dce2",
+    shellPlayUrl: "#/play/tetris",
+    difficulty: "Score chase",
+  }),
+});
+
+export const games = Object.freeze(gameCatalog.map((game) => Object.freeze({
+  ...game,
+  ...presentationBySlug[game.slug],
+})));
+
 const searchableFields = ["title", "description", "category", "provider"];
 
 export function listGames({ category, tags = [], query, status = GAME_STATUSES.published } = {}) {
   const normalizedTags = tags.map(normalize);
   const normalizedQuery = normalize(query);
 
-  return gameCatalog
+  return games
     .filter((game) => !status || game.status === status)
     .filter((game) => !category || normalize(game.category) === normalize(category))
     .filter((game) => {
@@ -87,9 +107,31 @@ export function listGames({ category, tags = [], query, status = GAME_STATUSES.p
 }
 
 export function getGameBySlug(slug) {
-  return gameCatalog.find((game) => game.slug === slug) ?? null;
+  return games.find((game) => game.slug === slug) ?? null;
+}
+
+export function getCategories() {
+  return ["All", ...uniqueSorted(games.map((game) => game.category))];
+}
+
+export function getOrientations() {
+  return ["All", ...uniqueSorted(games.map((game) => game.orientation))];
+}
+
+export function searchGames({ category = "All", orientation = "All", query = "" } = {}) {
+  const matches = listGames({
+    category: category === "All" ? undefined : category,
+    query,
+  });
+
+  if (orientation === "All") return matches;
+  return matches.filter((game) => game.orientation === orientation);
 }
 
 function normalize(value) {
   return String(value ?? "").trim().toLowerCase();
+}
+
+function uniqueSorted(values) {
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
 }

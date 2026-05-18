@@ -2,9 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { access } from "node:fs/promises";
 import {
+  games,
+  getCategories,
   gameCatalog,
   getGameBySlug,
+  getOrientations,
   listGames,
+  searchGames,
 } from "../src/catalog.js";
 
 const requiredFields = [
@@ -81,4 +85,24 @@ test("catalog cover assets exist for seeded games", async () => {
     const path = game.cover.replace(/^\.\//, "");
     await access(new URL(`../${path}`, import.meta.url));
   }
+});
+
+test("catalog play URLs resolve to site-internal entry pages", async () => {
+  for (const game of gameCatalog) {
+    const path = game.playUrl.replace(/^\.\//, "");
+    await access(new URL(`../${path}`, import.meta.url));
+  }
+});
+
+test("catalog exposes frontend filter options and shell play routes", () => {
+  assert.deepEqual(
+    games.map((game) => [game.slug, game.shellPlayUrl]),
+    [
+      ["snake", "#/play/snake"],
+      ["tetris", "#/play/tetris"],
+    ],
+  );
+  assert.deepEqual(getCategories(), ["All", "arcade", "puzzle"]);
+  assert.deepEqual(getOrientations(), ["All", "any"]);
+  assert.deepEqual(searchGames({ query: "blocks" }).map((game) => game.slug), ["tetris"]);
 });
